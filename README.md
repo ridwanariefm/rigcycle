@@ -1,59 +1,72 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# 🛒 RigCycle E-Commerce
+### Sistem E-Commerce untuk Penjualan Komponen dan Part PC
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+[![Laravel v10/11](https://img.shields.io/badge/Laravel-v10/11-FF2D20?style=for-the-badge&logo=laravel)](https://laravel.com)
+[![PHP](https://img.shields.io/badge/PHP-8.2%2B-777BB4?style=for-the-badge&logo=php)](https://www.php.net/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.x-06B6D4?style=for-the-badge&logo=tailwindcss)](https://tailwindcss.com/)
 
-## About Laravel
+## 📝 Deskripsi Proyek
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+RigCycle adalah platform e-commerce yang dikembangkan menggunakan framework Laravel, dirancang khusus untuk memfasilitasi penjualan komponen dan suku cadang PC (Baru dan Bekas).
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+Proyek ini mencakup fungsionalitas keranjang belanja, proses checkout yang terstruktur, integrasi pembayaran, dan riwayat pesanan yang *real-time*.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## ✨ Fitur Utama
 
-## Learning Laravel
+* **Katalog Produk:** Filter dan pencarian berdasarkan Kategori, Nama Produk, dan Kondisi (Baru/Bekas).
+* **Keranjang Belanja:** Manajemen kuantitas produk dan penghapusan item.
+* **Checkout & Pengiriman:** Input detail alamat pengiriman terstruktur (Provinsi, Kota, Kode Pos).
+* **Integrasi Pembayaran:** Pembayaran melalui layanan Midtrans (Snap Token Generation).
+* **Riwayat Pesanan:** Dashboard pengguna menampilkan histori pesanan dengan status *real-time* (sinkron dengan Midtrans) dan detail produk yang dapat diklik.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+## 🛠 Instalasi dan Pengembangan
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+Ikuti langkah-langkah di bawah ini untuk menjalankan proyek ini secara lokal:
 
-## Laravel Sponsors
+1.  **Clone Repository:**
+    ```bash
+    git clone [https://github.com/ridwanariefm/rigcycle.git](https://github.com/ridwanariefm/rigcycle.git)
+    cd rigcycle
+    ```
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+2.  **Instal Dependensi:**
+    ```bash
+    composer install
+    npm install
+    npm run dev # Atau npm run build
+    ```
 
-### Premium Partners
+3.  **Konfigurasi Lingkungan:**
+    ```bash
+    cp .env.example .env
+    php artisan key:generate
+    ```
+    Atur koneksi database (`DB_*`) dan Midtrans (`MIDTRANS_*`) di file `.env`.
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+4.  **Migrasi Database:**
+    Proyek ini memerlukan kolom-kolom baru (`shipping_address`, `subtotal`, dll.) yang telah ditambahkan.
+    ```bash
+    php artisan migrate
+    ```
 
-## Contributing
+5.  **Jalankan Server:**
+    ```bash
+    php artisan serve
+    ```
+    Aplikasi akan tersedia di `http://127.0.0.1:8000`.
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+## 🤝 Kontribusi
 
-## Code of Conduct
+Jika Anda ingin berkontribusi pada proyek ini, silakan buat *Pull Request*.
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+---
 
-## Security Vulnerabilities
+### 2. Lanjutkan Proses Push ke GitHub
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+Sekarang kita kembali ke masalah Git. Karena Anda mendapatkan error `fatal: couldn't find remote ref main`, kita akan menggunakan `master` untuk `pull` dan `push` (Opsi 1 dari respons sebelumnya).
 
-## License
+**Langkah 1: Tambahkan File README dan Commit Secara Lokal**
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+```bash
+git add .
+git commit -m "docs: Menambahkan README.md dan finalisasi perbaikan checkout"

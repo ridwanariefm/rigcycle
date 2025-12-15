@@ -60,13 +60,3 @@ Ikuti langkah-langkah di bawah ini untuk menjalankan proyek ini secara lokal:
 Jika Anda ingin berkontribusi pada proyek ini, silakan buat *Pull Request*.
 
 ---
-
-### 2. Lanjutkan Proses Push ke GitHub
-
-Sekarang kita kembali ke masalah Git. Karena Anda mendapatkan error `fatal: couldn't find remote ref main`, kita akan menggunakan `master` untuk `pull` dan `push` (Opsi 1 dari respons sebelumnya).
-
-**Langkah 1: Tambahkan File README dan Commit Secara Lokal**
-
-```bash
-git add .
-git commit -m "docs: Menambahkan README.md dan finalisasi perbaikan checkout"

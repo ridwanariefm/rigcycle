@@ -54,9 +54,3 @@ Ikuti langkah-langkah di bawah ini untuk menjalankan proyek ini secara lokal:
     php artisan serve
     ```
     Aplikasi akan tersedia di `http://127.0.0.1:8000`.
-
-## 🤝 Kontribusi
-
-Jika Anda ingin berkontribusi pada proyek ini, silakan buat *Pull Request*.
-
----

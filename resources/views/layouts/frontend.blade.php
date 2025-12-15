@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>@yield('title', 'RigCycle - Market Part Bekas')</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-    @stack('scripts')
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 </head>
 
 <body class="bg-gray-50 font-sans text-gray-900 antialiased flex flex-col min-h-screen">
@@ -128,6 +128,12 @@
             &copy; 2025 RigCycle Indonesia. All rights reserved.
         </div>
     </footer>
+
+    <script src="//unpkg.com/alpinejs" defer></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    @stack('scripts')
 
 </body>
 

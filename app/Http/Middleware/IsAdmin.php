@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use Illuminate\Support\Facades\Auth; // Tetap gunakan Facade
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -15,13 +16,20 @@ class IsAdmin
      */
     public function handle(Request $request, Closure $next): Response
     {
-        // Cek 1: Apakah sudah login?
-        // Cek 2: Apakah role-nya admin?
-        if (auth()->check() && auth()->user()->role === 'admin') {
-            return $next($request); // Silakan masuk
+        // Pilihan 1: Menggunakan Facade Auth (Mengatasi masalah Intelephense)
+        // Perbaikan: Gunakan Auth::check() untuk Intelephense
+        if (Auth::check() && Auth::user()->role === 'admin') {
+            return $next($request); 
         }
 
-        // Jika bukan admin, lempar error 403 (Forbidden)
+        // Pilihan 2: Menggunakan helper auth() (jika Intelephense tetap error)
+        /*
+        if (auth()->check() && auth()->user()->role === 'admin') {
+            return $next($request); 
+        }
+        */
+
+        // Jika tidak lolos cek, hentikan request
         abort(403, 'ANDA TIDAK MEMILIKI AKSES KE HALAMAN INI.');
     }
 }

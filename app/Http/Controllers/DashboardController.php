@@ -3,11 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\Order;
-use Illuminate\Http\Request;
+use Illuminate\Http\Request; // Tidak terpakai, bisa dihapus
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log; // Gunakan Facade Log untuk logging error
 use Midtrans\Config;
 use Midtrans\Transaction;
-use Exception; // Import Exception untuk penanganan error yang lebih baik
+use Exception;
 
 class DashboardController extends Controller
 {
@@ -15,11 +16,11 @@ class DashboardController extends Controller
     {
         $user = Auth::user();
 
-        // 1. Ambil Order yang statusnya masih 'unpaid', DENGAN relasi items.product untuk menghindari N+1 problem
+        // 1. Ambil semua Order milik user yang masih 'unpaid'
         $unpaidOrders = Order::where('user_id', $user->id)
                              ->where('status', 'unpaid')
-                             ->with('items.product') // <--- EAGER LOAD BARANG YANG DIBELI
-                             ->get();
+                             // Hanya butuh ID dan order_number untuk dicek
+                             ->get(['id', 'order_number', 'status']); 
 
         // 2. Konfigurasi Midtrans
         Config::$serverKey = config('midtrans.server_key');
@@ -30,35 +31,43 @@ class DashboardController extends Controller
         // 3. Loop dan Cek Status ke Midtrans
         foreach ($unpaidOrders as $order) {
             try {
-                // Minta status ke Midtrans berdasarkan Order ID
+                /**
+                 * Memberi tahu Intelephense bahwa $status adalah Objek Standar (stdClass)
+                 * yang dikembalikan oleh Midtrans API.
+                 * @var \stdClass $status
+                 */
                 $status = Transaction::status($order->order_number);
 
-                // Logika Update Status
                 $newStatus = null;
-                if ($status->transaction_status == 'settlement' || $status->transaction_status == 'capture') {
+                $transactionStatus = $status->transaction_status;
+                
+                // Logika Update Status
+                if ($transactionStatus == 'settlement' || $transactionStatus == 'capture') {
                     $newStatus = 'paid';
                 } 
-                else if ($status->transaction_status == 'expire') {
+                else if ($transactionStatus == 'expire') {
                     $newStatus = 'expired';
                 }
-                else if ($status->transaction_status == 'cancel' || $status->transaction_status == 'deny') {
+                else if ($transactionStatus == 'cancel' || $transactionStatus == 'deny' || $transactionStatus == 'failure') {
                     $newStatus = 'cancelled';
                 }
 
+                // Update hanya jika status baru berbeda
                 if ($newStatus && $order->status !== $newStatus) {
                     $order->update(['status' => $newStatus]);
+                    Log::info("Order [{$order->order_number}] status updated to: {$newStatus}");
                 }
 
             } catch (Exception $e) {
-                // Gunakan class Exception yang sudah di-import
+                // Log error Midtrans API call tanpa menghentikan loop
+                Log::error("Midtrans status check failed for order [{$order->order_number}]: " . $e->getMessage());
                 continue;
             }
         }
 
-        // 4. Ambil Data Terbaru (yang mungkin barusan di-update) untuk ditampilkan
-        // Pastikan eager load juga di sini
+        // 4. Ambil Data Terbaru (semua status) untuk ditampilkan di Dashboard
         $orders = Order::where('user_id', $user->id)
-                       ->with('items.product') // <--- EAGER LOAD UTAMA UNTUK VIEW
+                       ->with('items.product') // EAGER LOAD UTAMA UNTUK VIEW
                        ->latest()
                        ->get();
 

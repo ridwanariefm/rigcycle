@@ -7,8 +7,22 @@
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
     <h1 class="text-2xl font-bold mb-6">Keranjang Belanja</h1>
 
+    @if (session('success'))
+        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4" role="alert">
+            {{ session('success') }}
+        </div>
+    @endif
+    @if (session('error'))
+        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+            {{ session('error') }}
+        </div>
+    @endif
+
+    @php $grandTotal = 0; @endphp
+    
     @if($carts->count() > 0)
-        <div class="flex flex-col lg:flex-row gap-8">
+        
+        <div id="cart-container" class="flex flex-col lg:flex-row gap-8">
             
             <div class="flex-1">
                 <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
@@ -20,7 +34,6 @@
                         <div class="w-1/6 text-right">Total</div>
                     </div>
 
-                    @php $grandTotal = 0; @endphp
                     @foreach($carts as $cart)
                         @php 
                             $subtotal = $cart->product->price * $cart->quantity;
@@ -68,18 +81,20 @@
                                         <div class="flex items-center border border-gray-300 rounded-md w-max">
                                             <button type="button" 
                                                 class="px-3 py-1 text-gray-600 hover:bg-gray-100 border-r border-gray-300 disabled:opacity-50"
-                                                onclick="updateQuantity(this, -1)"
-                                                {{ $cart->quantity <= 1 ? 'disabled' : '' }}>
+                                                onclick="handleQuantityChange(this, -1)">
                                                 -
                                             </button>
 
-                                            <input type="number" name="quantity" value="{{ $cart->quantity }}" 
+                                            <input type="number" 
+                                                name="quantity" 
+                                                value="{{ $cart->quantity }}" 
                                                 class="w-12 text-center border-none p-1 text-sm focus:ring-0 appearance-none bg-white"
-                                                min="1" max="{{ $cart->product->stock }}" readonly>
-
+                                                min="1" 
+                                                max="{{ $cart->product->stock }}" 
+                                                onchange="validateAndSubmit(this)">
                                             <button type="button" 
                                                 class="px-3 py-1 text-gray-600 hover:bg-gray-100 border-l border-gray-300"
-                                                onclick="updateQuantity(this, 1)">
+                                                onclick="handleQuantityChange(this, 1)">
                                                 +
                                             </button>
                                         </div>
@@ -112,7 +127,8 @@
                     </a>
                 </div>
             </div>
-        </div>
+            
+            </div>
     @else
         <div class="text-center py-20 bg-white rounded-xl shadow-sm border border-gray-100">
             <div class="bg-indigo-50 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6">
@@ -126,33 +142,66 @@
         </div>
     @endif
 </div>
+@endsection
 
+@push('scripts')
 <script>
-    function updateQuantity(button, change) {
-        // 1. Ambil elemen input di dekat tombol yang diklik
-        const form = button.closest('form');
-        const input = form.querySelector('input[name="quantity"]');
+    // Fungsi universal untuk validasi dan submit (dipanggil oleh onchange)
+    function validateAndSubmit(input) {
+        const form = input.closest('form');
         const currentVal = parseInt(input.value);
         const maxStock = parseInt(input.getAttribute('max'));
-
-        // 2. Hitung nilai baru
-        let newVal = currentVal + change;
-
-        // 3. Validasi: Tidak boleh kurang dari 1
-        if (newVal < 1) newVal = 1;
-
-        // 4. Validasi: Tidak boleh lebih dari stok
-        if (newVal > maxStock) {
-            alert('Stok maksimal hanya ' + maxStock + ' item!');
-            return; // Batalkan
+        
+        let newVal = currentVal;
+        
+        // 1. Validasi minimum (jika diketik kurang dari 1 atau non-angka)
+        if (newVal < 1 || isNaN(newVal)) {
+            newVal = 1;
+            input.value = newVal;
         }
 
-        // 5. Set nilai baru ke input
-        input.value = newVal;
-
-        // 6. Submit form secara otomatis
+        // 2. Validasi Stok
+        if (newVal > maxStock) {
+            
+            if (typeof Swal !== 'undefined') {
+                 Swal.fire({
+                    icon: 'warning',
+                    title: 'Stok Tidak Mencukupi!',
+                    text: `Stok maksimum yang tersedia hanya ${maxStock} item. Kuantitas akan diatur ke ${maxStock}.`,
+                    confirmButtonText: 'OK',
+                    confirmButtonColor: '#4f46e5' 
+                });
+            } else {
+                // Fallback terakhir
+                alert(`Stok maksimum yang tersedia hanya ${maxStock} item.`); 
+            }
+            
+            // Set nilai input kembali ke stok maksimum
+            input.value = maxStock;
+            newVal = maxStock;
+            
+            // Lanjutkan submit setelah dibatasi stok
+        }
+        
+        // 3. Submit form
         form.submit();
     }
-</script>
 
-@endsection
+    // Fungsi untuk tombol + dan - (memanggil fungsi utama di atas)
+    function handleQuantityChange(button, change) {
+        const form = button.closest('form');
+        const input = form.querySelector('input[name="quantity"]');
+        
+        if (!input) return;
+
+        const currentVal = parseInt(input.value);
+        let newVal = currentVal + change;
+        
+        // Atur nilai baru sebelum validasi
+        input.value = newVal;
+        
+        // Panggil fungsi validasi dan submit utama
+        validateAndSubmit(input);
+    }
+</script>
+@endpush

@@ -3,6 +3,71 @@
 @section('title', 'Belanja Komputer & Part')
 
 @section('content')
+
+<div class="mb-10 w-full"> 
+    
+    <div x-data="{ activeSlide: 1, totalSlides: 3, interval: null }"
+         x-init="interval = setInterval(() => { activeSlide = (activeSlide % totalSlides) + 1 }, 5000)"
+         @mouseenter="clearInterval(interval)"
+         @mouseleave="interval = setInterval(() => { activeSlide = (activeSlide % totalSlides) + 1 }, 5000)"
+         
+         class="relative overflow-hidden bg-gray-900 h-[250px] md:h-[400px]"> 
+
+        <div class="flex transition-transform duration-500 ease-out h-full"
+             :style="`transform: translateX(-${(activeSlide - 1) * 100}%)`">
+            
+            <div class="w-full flex-shrink-0 relative bg-cover bg-center" style="background-image: url('https://picsum.photos/id/1018/1920/1080');">
+                <div class="absolute inset-0 bg-black/40 flex items-center justify-center px-4 sm:px-6 lg:px-8"> 
+                    <div class="text-center text-white p-6">
+                        <h2 class="text-3xl md:text-5xl font-extrabold mb-2">PROMO AWAL TAHUN!</h2>
+                        <p class="text-xl md:text-2xl font-light">Diskon 10% untuk semua VGA Card terbaru.</p>
+                        <a href="#" class="mt-4 inline-block bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-6 rounded-full transition">Belanja Sekarang</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="w-full flex-shrink-0 relative bg-cover bg-center" style="background-image: url('https://picsum.photos/id/1080/1920/1080');">
+                <div class="absolute inset-0 bg-indigo-900/60 flex items-center justify-center px-4 sm:px-6 lg:px-8">
+                     <div class="text-center text-white p-6">
+                        <h2 class="text-3xl md:text-5xl font-extrabold mb-2">Bekas Rasa Baru!</h2>
+                        <p class="text-xl md:text-2xl font-light">Garansi 6 bulan untuk semua komponen *used*.</p>
+                        <a href="{{ route('home', ['condition' => 'used']) }}" class="mt-4 inline-block bg-white hover:bg-gray-100 text-indigo-600 font-semibold py-2 px-6 rounded-full transition">Lihat Produk Bekas</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="w-full flex-shrink-0 relative bg-cover bg-center" style="background-image: url('https://picsum.photos/id/1025/1920/1080');">
+                <div class="absolute inset-0 bg-gray-900/60 flex items-center justify-center px-4 sm:px-6 lg:px-8">
+                    <div class="text-center text-white p-6">
+                        <h2 class="text-3xl md:text-5xl font-extrabold mb-2">PC Building Kit</h2>
+                        <p class="text-xl md:text-2xl font-light">Mulai rakit PC impianmu, gratis konsultasi.</p>
+                        <a href="#" class="mt-4 inline-block bg-emerald-500 hover:bg-emerald-600 text-white font-semibold py-2 px-6 rounded-full transition">Mulai Merakit</a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="absolute bottom-4 left-0 right-0 flex justify-center space-x-2">
+            <template x-for="i in totalSlides" :key="i">
+                <button @click="activeSlide = i; clearInterval(interval); interval = setInterval(() => { activeSlide = (activeSlide % totalSlides) + 1 }, 5000)"
+                        :class="{'bg-white': activeSlide === i, 'bg-white/50 hover:bg-white': activeSlide !== i}"
+                        class="w-3 h-3 rounded-full transition-colors duration-300"></button>
+            </template>
+        </div>
+        
+        <button @click="activeSlide = activeSlide > 1 ? activeSlide - 1 : totalSlides; clearInterval(interval); interval = setInterval(() => { activeSlide = (activeSlide % totalSlides) + 1 }, 5000)"
+                class="absolute top-1/2 left-0 transform -translate-y-1/2 text-white p-4 rounded-r-lg bg-black/30 hover:bg-black/50 transition hidden md:block z-20">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+        </button>
+        <button @click="activeSlide = activeSlide < totalSlides ? activeSlide + 1 : 1; clearInterval(interval); interval = setInterval(() => { activeSlide = (activeSlide % totalSlides) + 1 }, 5000)"
+                class="absolute top-1/2 right-0 transform -translate-y-1/2 text-white p-4 rounded-l-lg bg-black/30 hover:bg-black/50 transition hidden md:block z-20">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+        </button>
+
+    </div>
+</div>
+
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
 
     <div class="mb-8 text-center md:text-left">

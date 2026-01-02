@@ -99,11 +99,11 @@ class AdminProductController extends Controller
     // 5. Proses Update Data
     public function update(Request $request, Product $product)
     {
-        // A. Validasi (Sudah ditambah validasi Stock)
+        // A. Validasi (Tetap sama)
         $request->validate([
             'name' => 'required|string|max:255',
             'price' => 'required|numeric',
-            'stock' => 'required|integer|min:0', // <--- TAMBAHAN VALIDASI STOK
+            'stock' => 'required|integer|min:0',
             'image' => 'image|mimes:jpeg,png,jpg|max:2048',
             'category_id' => 'required',
             'store_id' => 'required',
@@ -115,6 +115,19 @@ class AdminProductController extends Controller
         $data = $request->except(['image']);
         $data['slug'] = Str::slug($request->name);
 
+        // --- TAMBAHKAN LOGIKA MAPPING DI SINI ---
+        $conditionMap = [
+            'Baru' => 'new',
+            'Bekas' => 'used',
+            'Refurbished' => 'refurbished'
+        ];
+        
+        // Ubah nilai condition di dalam array $data sebelum dikirim ke database
+        if (isset($conditionMap[$request->condition])) {
+            $data['condition'] = $conditionMap[$request->condition];
+        }
+        // ----------------------------------------
+
         // C. Cek Upload Gambar Baru
         if ($request->hasFile('image')) {
             if ($product->image) {
@@ -124,20 +137,29 @@ class AdminProductController extends Controller
         }
 
         // D. Lakukan Update
-        $product->update($data); // Stock otomatis terupdate karena ada di $data
+        $product->update($data); 
 
         return redirect()->route('admin.products.index')->with('success', 'Produk berhasil diperbarui!');
-    }
+    }   
 
     // 6. Proses Hapus Data
     public function destroy(Product $product)
     {
+        // Cek apakah produk sudah punya transaksi
+        $hasOrders = \App\Models\OrderItem::where('product_id', $product->id)->exists();
+
+        if ($hasOrders) {
+            // Jika sudah ada transaksi, jangan hapus, tapi nonaktifkan saja
+            $product->update(['is_active' => false]);
+            return redirect()->back()->with('success', 'Produk memiliki riwayat transaksi. Status diubah menjadi Non-Aktif.');
+        }
+
+        // Jika belum ada transaksi sama sekali, boleh hapus permanen
         if ($product->image) {
             Storage::disk('public')->delete($product->image);
         }
-
         $product->delete();
 
         return redirect()->route('admin.products.index')->with('success', 'Produk berhasil dihapus!');
-    }
+    }   
 }
